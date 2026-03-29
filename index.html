@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <title>Trình Tạo Màn Chơi Platformer 2D</title>
+        <style>
+            html, body {
+                margin: 0;
+                overflow: hidden;
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                font-family: "Helvetica";
+                text-align: "center";
+                background-color: #DDDDEE
+            }
+            #canvas {
+                width: 100%;
+                height: 100%;
+            }
+            .sliders {
+                display: flex;
+                flex: 1;
+                flex-direction: row;
+                width: 100%;
+            }
+            .slider-square {
+                -webkit-appearance: none;
+                height: 15px;
+                width: 90%;
+                border-radius: 5px;
+                background: #D3D3D3;
+                outline: none;
+            }
+            .slider-square::-moz-range-thumb, .slider-square::-moz-range-thumb {
+                width: 25px;
+                height: 25px;
+                border-radius: 25%;
+                background: #4CAF50;
+                cursor: pointer;
+            }
+
+            #groupNumberContainer, #groupLengthContainer {
+                width: 50%;
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+                align-items: center;
+            }
+            #groupNumberSlider, #groupLengthSlider {
+                display: flex;
+                flex: 1;
+                flex-direction: row;
+                align-items: center;
+                width: 85%;
+                background: #AAAABB;
+                border-radius: 10px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .slider-display {
+                margin-left: 5px;
+                text-align: center;
+                vertical-align: middle;
+                font-size: 14pt;
+                font-family: "Helvetica";
+                background: #BBBBCC;
+                width: 15%;
+                height: 50%;
+                line-height: 42px;
+                border-radius: 5px;
+                color: #444444;
+            }
+
+            select {
+                position: relative;
+                font-family: "Helvetica";
+                height: 30px;
+                width: 100%;
+                font-size: 11pt;
+            }
+
+            .selects {
+                display: flex;
+                flex: 1;
+                flex-direction: row;
+                margin-top: 30px;
+                padding-bottom: 22px;
+                width: 94%;
+                border-radius: 10px;
+                background: #AAAABB;
+            }
+
+            .selectContainer {
+                display: flex;;
+                flex: 1;
+                flex-direction: column;
+                width: 22%;
+                min-width: 115px;
+                margin-left: 10px;
+                margin-right: 10px;
+                align-items: center;
+            }
+
+            .selectContainer h3 {
+                word-break: break-word;
+                hyphens: auto;
+            }
+
+            button {
+                margin-top: 30px;
+                height: 50px;
+                width: 50%;
+                border-radius: 5px;
+                border-style: none;
+                background-color: #AABBCC;
+                font-size: 20pt;
+                color: #DEDEDE;
+                font-weight: bold;
+            }
+
+
+        </style>
+    </head>
+
+    <body>
+        <h1>Trình Tạo Màn Chơi</h1>
+
+        <div class="sliders">
+            <div id="groupLengthContainer">
+                <h3>Độ Dài Nhóm Nhịp</h3>
+                <div id="groupLengthSlider">
+                    <input id="timeSelect" type="range" min=10 max=30 value=20 autocomplete="off" class="slider-square">
+                    <p id="timeSelectDisplay" class="slider-display">20 giây</p>
+                </div>
+            </div>
+
+            <div id="groupNumberContainer">
+                <h3>Số Lượng Nhóm Nhịp</h3>
+                <div id="groupNumberSlider">
+                    <input id="numberSelect" type="range" min=1 max=10 value=3 autocomplete="off" class="slider-square">
+                    <p id="numberDisplay" class="slider-display">3</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="selects">
+            <div class="selectContainer">
+                <h3>Loại Nhịp</h3>
+                <select id="rhythmSelect" autocomplete="off">
+                    <option value="0" selected="selected">Đều</option>
+                    <option value="1">Ngẫu Nhiên</option>
+                    <option value="2">Nhịp Lắc</option>
+                    <option value="3">Đều Và Lắc</option>
+                </select>
+            </div>
+
+            <div class="selectContainer">
+                <h3>Trọng Lực</h3>
+                <select id="gravitySelect" autocomplete="off">
+                    <option value="1.75">Thấp</option>
+                    <option value="2.50" selected="selected">Bình Thường</option>
+                    <option value="3.25">Cao</option>
+                </select>
+            </div>
+
+            <div class="selectContainer">
+                <h3>Lực Nhảy</h3>
+                <select id="jumpSelect" autocomplete="off">
+                    <option value="4.5">Yếu</option>
+                    <option value="5.5" selected="selected">Bình Thường</option>
+                    <option value="6.5">Mạnh</option>
+                </select>
+            </div>
+
+            <div class="selectContainer">
+                <h3>Tốc Độ Di Chuyển</h3>
+                <select id="speedSelect" autocomplete="off">
+                    <option value="7.5">Chậm</option>
+                    <option value="9.5" selected="selected">Bình Thường</option>
+                    <option value="14.5">Nhanh</option>
+                </select>
+            </div>
+
+            <div class="selectContainer">
+                <h3>Mật Độ Màn Chơi</h3>
+                <select id="densitySelect" autocomplete="off">
+                    <option value="0.5">Thưa</option>
+                    <option value="1.0" selected="selected">Bình Thường</option>
+                    <option value="2.0">Dày Đặc</option>
+                </select>
+            </div>
+        </div>
+
+        <button id="generateLevelButton">
+            Tạo Màn Chơi
+        </button>
+
+        <script type="text/javascript" src="dist/bundle.js"></script>
+
+    </body>
+</html>
