@@ -65,7 +65,6 @@ class RhythmGroupGenerator {
             this.maxGroupDuration :
             Math.abs(Math.random() * (this.maxGroupDuration - this.minGroupDuration) + this.minGroupDuration);
 
-        // Decide the beat pattern randomly
         let rng = Math.random();
         let cumulative = 0;
         let chosenPattern: BeatPattern;

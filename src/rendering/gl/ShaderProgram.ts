@@ -134,7 +134,7 @@ class ShaderProgram {
         if (this.attrPos != -1 && d.bindPos()) {
             gl.enableVertexAttribArray(this.attrPos);
             gl.vertexAttribPointer(this.attrPos, 2, gl.FLOAT, false, 0, 0);
-            gl.vertexAttribDivisor(this.attrPos, 0); // Advance 1 index in pos VBO for each vertex
+            gl.vertexAttribDivisor(this.attrPos, 0);
         }
     
         if (this.attrUV != -1 && d.bindUV()) {

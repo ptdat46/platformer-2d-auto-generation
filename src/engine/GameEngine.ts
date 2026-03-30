@@ -80,7 +80,6 @@ class GameEngine {
             }
             this.downkeys.add(keyEvent.key);
 
-            // [DEBUG] Phím G: spawn gem ngay tại vị trí player (để test đoạn cuối)
             if (keyEvent.key === 'g' || keyEvent.key === 'G') {
                 for (let go of this.gameObjects) {
                     if (go.constructor.name === "Player") {
@@ -184,7 +183,6 @@ class GameEngine {
         this.renderer.render(this.camera, this.spriteShader, [this.tile]);
     }
 
-    // Only call from GameObject class
     addGameObject(go: GameObject) {
         if (this.gameObjects.indexOf(go) < 0) {
             this.gameObjects.push(go);
@@ -194,7 +192,6 @@ class GameEngine {
         }
     }
 
-    // Only call from the GameObject cass
     destroyGameObject(go: GameObject) {
         let idx = this.gameObjects.indexOf(go);
         if (idx >= 0) {

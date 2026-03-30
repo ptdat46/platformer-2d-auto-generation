@@ -30,7 +30,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _globals__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
 
-// In this file, `gl` is accessible because it is imported above
 class OpenGLRenderer {
     constructor(canvas) {
         this.canvas = canvas;
@@ -2957,7 +2956,6 @@ class GameEngine {
                 this.gameObjects.forEach((go) => { go.onKeyDown(keyEvent.key); });
             }
             this.downkeys.add(keyEvent.key);
-            // [DEBUG] Phím G: spawn gem ngay tại vị trí player (để test đoạn cuối)
             if (keyEvent.key === 'g' || keyEvent.key === 'G') {
                 for (let go of this.gameObjects) {
                     if (go.constructor.name === "Player") {
@@ -3041,7 +3039,6 @@ class GameEngine {
         this.renderer.render(this.camera, this.backgroundShader, [this.background]);
         this.renderer.render(this.camera, this.spriteShader, [this.tile]);
     }
-    // Only call from GameObject class
     addGameObject(go) {
         if (this.gameObjects.indexOf(go) < 0) {
             this.gameObjects.push(go);
@@ -3050,7 +3047,6 @@ class GameEngine {
             }
         }
     }
-    // Only call from the GameObject cass
     destroyGameObject(go) {
         let idx = this.gameObjects.indexOf(go);
         if (idx >= 0) {
@@ -3280,7 +3276,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var gl_matrix__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 
 const spriteCoordinates = {
-    // Terrain
     SPRITE_TERRAIN_TOP_LEFT: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(0, 0),
     SPRITE_TERRAIN_TOP: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(1, 0),
     SPRITE_TERRAIN_TOP_RIGHT: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(2, 0),
@@ -3299,12 +3294,10 @@ const spriteCoordinates = {
     SPRITE_TERRAIN_RIGHT_INNER_CORNER: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(6, 2),
     SPRITE_TERRAIN_COLUMN: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(7, 1),
     SPRITE_TERRAIN_CAP: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(7, 0),
-    // Entities
     SPRITE_PICKUP: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(0, 3),
     SPRITE_SPIKE: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(3, 2),
     SPRITE_PLATFORM_LEFT: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(5, 4),
     SPRITE_PLATFORM_RIGHT: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(6, 4),
-    // Player
     SPRITE_PLAYER_STAND: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(0, 7),
     SPRITE_PLAYER_JUMP: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(1, 7),
     SPRITE_PLAYER_WALK_1: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(2, 7),
@@ -3313,21 +3306,17 @@ const spriteCoordinates = {
     SPRITE_PLAYER_IDLE1: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(5, 7),
     SPRITE_PLAYER_IDLE2: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(6, 7),
     SPRITE_PLAYER_DEATH: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(7, 7),
-    // Coin
     SPRITE_COIN_1: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(0, 3),
     SPRITE_COIN_2: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(1, 3),
     SPRITE_COIN_3: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(2, 3),
     SPRITE_COIN_4: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(0, 4),
     SPRITE_COIN_5: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(1, 4),
     SPRITE_GEM: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(6, 5),
-    // Particles
     SPRITE_Z: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(6, 6),
     SPRITE_POFF: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(7, 6),
     SPRITE_SPARKLE: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(5, 6),
-    // Enemy
     SPRITE_BADDIE_1: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(0, 5),
     SPRITE_BADDIE_2: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(1, 5),
-    // Checkpoint
     SPRITE_FLAG_1: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(2, 4),
     SPRITE_FLAG_2: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(3, 4),
     SPRITE_FLAG_3: gl_matrix__WEBPACK_IMPORTED_MODULE_0__.fromValues(4, 4),
@@ -4136,15 +4125,12 @@ class GameObject {
             return;
         }
         let prevVelocity = this.velocity;
-        //this.velocity = vec2.fromValues(0, 0);
-        // Apply gravity
         if (this.grounded) {
             this.velocity[1] = 0;
         }
         else {
             this.velocity[1] -= _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_1__["default"].gravity;
         }
-        // Apply non-physical motion
         if (Math.abs(this.inputVelocity[0]) > 0.001) {
             let influence = this.grounded ? 0.2 : 0.11;
             this.velocity[0] = (1 - influence) * this.velocity[0] + influence * this.inputVelocity[0];
@@ -4156,20 +4142,10 @@ class GameObject {
             this.velocity[0] *= 0.95;
         }
         this.velocity[1] += this.inputVelocity[1];
-        // Scale back velocity if it's too high
         let speed = gl_matrix__WEBPACK_IMPORTED_MODULE_2__.length(this.velocity);
         if (speed > _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_1__["default"].maxObjectSpeed) {
             gl_matrix__WEBPACK_IMPORTED_MODULE_2__.scale(this.velocity, this.velocity, _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_1__["default"].maxObjectSpeed / speed);
         }
-        // Update the object position, accounting for collisions
-        // We assume that before applying any motion this frame, the object is not intersecting anything
-        // We will use the following technique to do this:
-        //   - Apply the velocity vector to our position in the x axis only
-        //   - Check if, in this new position, the object intersects with the terrain (in all axes)
-        //   - If the object is now intersecting with a tile, we respond by pushing back the object by
-        //     the amount of the overlap
-        //     - Note that this pushback will only have to be in the x axis
-        //   - Repeat with the y-axis
         let deltaPos = gl_matrix__WEBPACK_IMPORTED_MODULE_2__.scale(gl_matrix__WEBPACK_IMPORTED_MODULE_2__.create(), this.velocity, 1.0 / 60);
         this.goCollide = false;
         for (let axis = 0; axis < 2; axis++) {
@@ -4247,7 +4223,6 @@ class GameObject {
         let tY = other.getPosition()[1];
         let pX = this.position[0];
         let pY = this.position[1];
-        // Anti-frustration feature
         if (other.constructor.name === "Spike" || other.constructor.name === "Baddie") {
             tX += 0.5;
             tY += 0.5;
@@ -4289,7 +4264,6 @@ class GameObject {
         }
     }
     checkIfGrounded() {
-        // Check if we would be colliding with a block if we were just a teensy bit lower
         let newPos = gl_matrix__WEBPACK_IMPORTED_MODULE_2__.subtract(gl_matrix__WEBPACK_IMPORTED_MODULE_2__.create(), this.position, gl_matrix__WEBPACK_IMPORTED_MODULE_2__.fromValues(0, 0.05));
         let gridPosition = gl_matrix__WEBPACK_IMPORTED_MODULE_2__.fromValues(Math.floor(newPos[0]), Math.floor(newPos[1]));
         for (let x = 0; x < 2; x++) {
@@ -4523,7 +4497,7 @@ class Drawable {
         this.offGenerated = false;
         this.mirGenerated = false;
         this.scaleGenerated = false;
-        this.numInstances = 0; // How many instances of this Drawable the shader program should draw
+        this.numInstances = 0;
     }
     destroy() {
         _globals__WEBPACK_IMPORTED_MODULE_0__.gl.deleteBuffer(this.bufIdx);
@@ -4837,7 +4811,7 @@ class ShaderProgram {
         if (this.attrPos != -1 && d.bindPos()) {
             _globals__WEBPACK_IMPORTED_MODULE_0__.gl.enableVertexAttribArray(this.attrPos);
             _globals__WEBPACK_IMPORTED_MODULE_0__.gl.vertexAttribPointer(this.attrPos, 2, _globals__WEBPACK_IMPORTED_MODULE_0__.gl.FLOAT, false, 0, 0);
-            _globals__WEBPACK_IMPORTED_MODULE_0__.gl.vertexAttribDivisor(this.attrPos, 0); // Advance 1 index in pos VBO for each vertex
+            _globals__WEBPACK_IMPORTED_MODULE_0__.gl.vertexAttribDivisor(this.attrPos, 0);
         }
         if (this.attrUV != -1 && d.bindUV()) {
             _globals__WEBPACK_IMPORTED_MODULE_0__.gl.enableVertexAttribArray(this.attrUV);
@@ -4892,7 +4866,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _globals__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
-// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
 class Texture2D {
     constructor(path, slot = 0) {
         this.loaded = false;
@@ -4947,9 +4920,7 @@ class LevelGenerator {
         this.totalGroups = _totalGroups;
         this.terrain = _terrain;
         this.rhythmGroups = [];
-        // Create the rhythm generator
         this.groupGenerator = new _RhythmGroupGenerator__WEBPACK_IMPORTED_MODULE_0__["default"](minGroupDuration, maxGroupDuration, density, jumpFrequency, beatFrequencies);
-        // Create the geometry generator
         this.geometryGenerator = new _GeometryGenerator__WEBPACK_IMPORTED_MODULE_1__["default"](this.terrain);
     }
     generateRhythms() {
@@ -5077,7 +5048,6 @@ class RhythmGroupGenerator {
         let groupDuration = this.minGroupDuration === this.maxGroupDuration ?
             this.maxGroupDuration :
             Math.abs(Math.random() * (this.maxGroupDuration - this.minGroupDuration) + this.minGroupDuration);
-        // Decide the beat pattern randomly
         let rng = Math.random();
         let cumulative = 0;
         let chosenPattern;
@@ -5226,20 +5196,9 @@ class GeometryGenerator {
         }
         return { moveStates: movement, jumpStates: jumps };
     }
-    // Calculate the height of a jump when the jump button is held for a specified amount of time
-    // Also find the time it takes to get to that height
     getJumpHeight(jumpHold) {
-        // This is, at its core, a ballistics problem. However, it's complicated by the fact
-        // that the velocity is controlled by the player even after the jump begins. This means 
-        // that to find the max height, we have to separate the jump into 2 parts: the part 
-        // where the jump key is being held, and the part afterward. We have to find the height
-        // and upward velocity acheived at the end of the first part, and then the second part
-        // just becomes a simple physics problem. Getting those vectors will rely heavily on the
-        // jumping implementation though.
         let gravity = _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_1__["default"].gravity;
         let jumpVel = _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_1__["default"].playerJump;
-        // To simplify the math (and because it wouldn't be entirely accurate anyway)
-        // I am just going to simulate jumping (assuming perfect framerate)
         let vel = 0;
         let inputvel = 0;
         let pos = 0;
@@ -5340,7 +5299,7 @@ class GeometryGenerator {
         let totalFrames = height.time * 60 + Math.sqrt((height.height) / (_scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_1__["default"].gravity / 60));
         let totalDistance = Math.floor(_scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_1__["default"].playerSpeed * totalFrames / 60);
         let peakDistance = Math.floor(_scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_1__["default"].playerSpeed * height.time);
-        let spikeGapOffset = 1; // khoảng cách thêm giữa gai trên và dưới
+        let spikeGapOffset = 1;
         for (let jump of this.jumpHeights.keys()) {
             if (jumpType != jump) {
                 new _scene_Spike__WEBPACK_IMPORTED_MODULE_2__["default"]([
@@ -5530,7 +5489,6 @@ class Coin extends _engine_GameObject__WEBPACK_IMPORTED_MODULE_0__["default"] {
             return _constants__WEBPACK_IMPORTED_MODULE_2__.spriteCoordinates.SPRITE_COIN_4;
         }
         else if (this.animationFrame < ANIMATION_FRAME_LENGTH * 5) {
-            //this.direction = this.direction = -1;
             return _constants__WEBPACK_IMPORTED_MODULE_2__.spriteCoordinates.SPRITE_COIN_5;
         }
         else if (this.animationFrame < ANIMATION_FRAME_LENGTH * 6) {
@@ -5704,7 +5662,7 @@ module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nuniform vec2 
 /* 34 */
 /***/ ((module) => {
 
-module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nuniform sampler2D u_SpriteTex;\r\nuniform vec2 u_CameraPos;\r\nuniform float u_Time;\r\nuniform int u_Win;\r\n\r\nin vec2 fs_Pos;\r\nin vec2 fs_UV1;\r\nin vec2 fs_UV2;\r\n\r\nout vec4 out_Col;\r\n\r\nconst vec2 SEED2 = vec2(0.31415, 0.6456);\r\n\r\nvec3 palette(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d){\r\n    return a + b*cos( 6.28318*(c*t+d) );\r\n}\r\n\r\nfloat random1(vec2 p) {\r\n    return fract(sin(dot(p + SEED2, vec2(127.1, 311.7))) * 43758.5453);\r\n}\r\n\r\nvec2 random2( vec2 p , vec2 seed) {\r\n    return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\r\n}\r\n\r\nfloat worley(vec2 noisePos, float frequency) {\r\n    vec2 point = noisePos * frequency;\r\n    vec2 cell = floor(point);\r\n\r\n    // Check the neighboring cells for the closest cell point\r\n    float closestDistance = 2.0;\r\n    for (int i = 0; i < 9; i++) {\r\n        vec2 curCell = cell + vec2(i % 3 - 1, floor(float(i / 3) - 1.0));\r\n        vec2 cellPoint = vec2(curCell) + random2(vec2(curCell), SEED2);\r\n        closestDistance = min(closestDistance, distance(cellPoint, point));\r\n    }\r\n    return clamp(0.0, 1.0, closestDistance);\r\n}\r\n\r\nfloat brownianNoise(vec2 noisePos, vec2 seed) {\r\n    vec2 boxPos = vec2(floor(noisePos.x), floor(noisePos.y));\r\n\r\n    // Get the noise at the corners of the cells\r\n    float corner0 = random1(boxPos + vec2(0.0, 0.0));\r\n    float corner1 = random1(boxPos + vec2(1.0, 0.0));\r\n    float corner2 = random1(boxPos + vec2(0.0, 1.0));\r\n    float corner3 = random1(boxPos + vec2(1.0, 1.0));\r\n\r\n    // Get cubic interpolation factors\r\n    float tx = smoothstep(0.0, 1.0, fract(noisePos.x));\r\n    float ty = smoothstep(0.0, 1.0, fract(noisePos.y));\r\n\r\n    // Perform bicubic interpolation\r\n    return mix(mix(corner0, corner1, tx), mix(corner2, corner3, tx), ty);\r\n}\r\n\r\nfloat fbm(vec2 noisePos, int numOctaves, float startFrequency) {\r\n    float totalNoise = 0.0;\r\n    float normalizer = 0.0;\r\n    const float PERSISTENCE = 0.5;\r\n\r\n    float frequency = startFrequency;\r\n    float amplitude = PERSISTENCE;\r\n\r\n    for (int i = 0; i < numOctaves; i++) {\r\n        normalizer += amplitude;\r\n        totalNoise += brownianNoise(noisePos * frequency, SEED2) * amplitude;\r\n        frequency *= 2.0;\r\n        amplitude *= PERSISTENCE;\r\n    }\r\n    return totalNoise / normalizer;\r\n}\r\n\r\nvoid main() {\r\n    vec2 uv1 = vec2(fs_UV1.x, clamp(fs_UV1.y, 0.000, 0.249));\r\n    vec2 uv2 = vec2(fs_UV2.x, clamp(fs_UV2.y, 0.251, 0.499));\r\n    float starRadius = 0.01 + abs(sin(u_Time * 0.01 + random1(fs_Pos) * 100.0)) * 0.01;\r\n    vec3 stars = worley(fs_Pos, 10.0) < starRadius ? vec3(1) : vec3(0);\r\n    vec4 sky = mix(vec4(0.3, 0.3, 0.25, 1.0), vec4(stars, 1), pow((fs_Pos[1] + 1.0) / 2.0, 0.5));\r\n\r\n    vec4 layer1 = texture(u_SpriteTex, uv1);\r\n    vec4 layer2 = texture(u_SpriteTex, uv2);\r\n\r\n    if (u_Win == 1) {\r\n        float breathe = 0.5 + 0.5 * sin(u_Time * 0.03);\r\n        float wave = 0.5 + 0.5 * sin(u_Time * 0.02 + fs_Pos[0] * 0.5 + fs_Pos[1] * 0.3);\r\n\r\n        vec3 skyColor = mix(\r\n            mix(vec3(0.1, 0.05, 0.3), vec3(0.0, 0.6, 1.0), wave),\r\n            mix(vec3(1.0, 0.3, 0.6), vec3(1.0, 0.9, 0.2), wave),\r\n            breathe\r\n        );\r\n\r\n        layer1.rgb = mix(layer1.rgb, vec3(0.8, 0.9, 1.0), 0.3);\r\n        layer2.rgb = mix(layer2.rgb, vec3(0.9, 0.95, 1.0), 0.3);\r\n        sky.rgb = skyColor;\r\n    }\r\n\r\n    vec4 color = \r\n        layer1.a > 0.5 ? layer1 :\r\n        layer2.a > 0.5 ? layer2 :\r\n        sky;\r\n\r\n    out_Col = vec4(color.rgb, 1);\r\n}\r\n"
+module.exports = "#version 300 es\r\nprecision highp float;\r\n\r\nuniform sampler2D u_SpriteTex;\r\nuniform vec2 u_CameraPos;\r\nuniform float u_Time;\r\nuniform int u_Win;\r\n\r\nin vec2 fs_Pos;\r\nin vec2 fs_UV1;\r\nin vec2 fs_UV2;\r\n\r\nout vec4 out_Col;\r\n\r\nconst vec2 SEED2 = vec2(0.31415, 0.6456);\r\n\r\nvec3 palette(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d){\r\n    return a + b*cos( 6.28318*(c*t+d) );\r\n}\r\n\r\nfloat random1(vec2 p) {\r\n    return fract(sin(dot(p + SEED2, vec2(127.1, 311.7))) * 43758.5453);\r\n}\r\n\r\nvec2 random2( vec2 p , vec2 seed) {\r\n    return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\r\n}\r\n\r\nfloat worley(vec2 noisePos, float frequency) {\r\n    vec2 point = noisePos * frequency;\r\n    vec2 cell = floor(point);\r\n\r\n    float closestDistance = 2.0;\r\n    for (int i = 0; i < 9; i++) {\r\n        vec2 curCell = cell + vec2(i % 3 - 1, floor(float(i / 3) - 1.0));\r\n        vec2 cellPoint = vec2(curCell) + random2(vec2(curCell), SEED2);\r\n        closestDistance = min(closestDistance, distance(cellPoint, point));\r\n    }\r\n    return clamp(0.0, 1.0, closestDistance);\r\n}\r\n\r\nfloat brownianNoise(vec2 noisePos, vec2 seed) {\r\n    vec2 boxPos = vec2(floor(noisePos.x), floor(noisePos.y));\r\n\r\n    float corner0 = random1(boxPos + vec2(0.0, 0.0));\r\n    float corner1 = random1(boxPos + vec2(1.0, 0.0));\r\n    float corner2 = random1(boxPos + vec2(0.0, 1.0));\r\n    float corner3 = random1(boxPos + vec2(1.0, 1.0));\r\n\r\n    float tx = smoothstep(0.0, 1.0, fract(noisePos.x));\r\n    float ty = smoothstep(0.0, 1.0, fract(noisePos.y));\r\n\r\n    return mix(mix(corner0, corner1, tx), mix(corner2, corner3, tx), ty);\r\n}\r\n\r\nfloat fbm(vec2 noisePos, int numOctaves, float startFrequency) {\r\n    float totalNoise = 0.0;\r\n    float normalizer = 0.0;\r\n    const float PERSISTENCE = 0.5;\r\n\r\n    float frequency = startFrequency;\r\n    float amplitude = PERSISTENCE;\r\n\r\n    for (int i = 0; i < numOctaves; i++) {\r\n        normalizer += amplitude;\r\n        totalNoise += brownianNoise(noisePos * frequency, SEED2) * amplitude;\r\n        frequency *= 2.0;\r\n        amplitude *= PERSISTENCE;\r\n    }\r\n    return totalNoise / normalizer;\r\n}\r\n\r\nvoid main() {\r\n    vec2 uv1 = vec2(fs_UV1.x, clamp(fs_UV1.y, 0.000, 0.249));\r\n    vec2 uv2 = vec2(fs_UV2.x, clamp(fs_UV2.y, 0.251, 0.499));\r\n    float starRadius = 0.01 + abs(sin(u_Time * 0.01 + random1(fs_Pos) * 100.0)) * 0.01;\r\n    vec3 stars = worley(fs_Pos, 10.0) < starRadius ? vec3(1) : vec3(0);\r\n    vec4 sky = mix(vec4(0.3, 0.3, 0.25, 1.0), vec4(stars, 1), pow((fs_Pos[1] + 1.0) / 2.0, 0.5));\r\n\r\n    vec4 layer1 = texture(u_SpriteTex, uv1);\r\n    vec4 layer2 = texture(u_SpriteTex, uv2);\r\n\r\n    if (u_Win == 1) {\r\n        float breathe = 0.5 + 0.5 * sin(u_Time * 0.03);\r\n        float wave = 0.5 + 0.5 * sin(u_Time * 0.02 + fs_Pos[0] * 0.5 + fs_Pos[1] * 0.3);\r\n\r\n        vec3 skyColor = mix(\r\n            mix(vec3(0.1, 0.05, 0.3), vec3(0.0, 0.6, 1.0), wave),\r\n            mix(vec3(1.0, 0.3, 0.6), vec3(1.0, 0.9, 0.2), wave),\r\n            breathe\r\n        );\r\n\r\n        layer1.rgb = mix(layer1.rgb, vec3(0.8, 0.9, 1.0), 0.3);\r\n        layer2.rgb = mix(layer2.rgb, vec3(0.9, 0.95, 1.0), 0.3);\r\n        sky.rgb = skyColor;\r\n    }\r\n\r\n    vec4 color = \r\n        layer1.a > 0.5 ? layer1 :\r\n        layer2.a > 0.5 ? layer2 :\r\n        sky;\r\n\r\n    out_Col = vec4(color.rgb, 1);\r\n}\r\n"
 
 /***/ }),
 /* 35 */
@@ -5763,8 +5721,6 @@ class Player extends _engine_GameObject__WEBPACK_IMPORTED_MODULE_0__["default"] 
             }
         }
         if (this.jumping) {
-            // I have decided to perform this operation in units of frames instead of seconds to ensure
-            // that the jump height is consistent. It makes geometry generator calculations easier too
             this.jumpTime -= 0.016;
             let t = Math.max(0, this.jumpTime / 0.4);
             this.inputVelocity[1] = t * _SceneAttributes__WEBPACK_IMPORTED_MODULE_1__["default"].playerJump;
@@ -6034,12 +5990,10 @@ let Stats = __webpack_require__(36);
 let time = 0.0;
 let gameStart = false;
 function main() {
-    // Rhythm Type
     let rhythmTypeSelect = document.getElementById("rhythmSelect");
     rhythmTypeSelect.onchange = () => {
         _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_4__["default"].rhythmType = parseInt(rhythmTypeSelect.value);
     };
-    // Rhythm Group Length
     let groupLengthSlider = document.getElementById("timeSelect");
     let groupLengthOutput = document.getElementById("timeSelectDisplay");
     groupLengthOutput.innerHTML = groupLengthSlider.value + " giây";
@@ -6047,7 +6001,6 @@ function main() {
         groupLengthOutput.innerHTML = groupLengthSlider.value + " giây";
         _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_4__["default"].rhythmGroupLength = parseInt(groupLengthSlider.value);
     };
-    // Rhythm Group Number
     let groupNumberSelect = document.getElementById("numberSelect");
     let groupNumberOutput = document.getElementById("numberDisplay");
     groupNumberOutput.innerHTML = groupNumberSelect.value;
@@ -6055,33 +6008,27 @@ function main() {
         groupNumberOutput.innerHTML = groupNumberSelect.value;
         _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_4__["default"].numberOfGroups = parseInt(groupNumberSelect.value);
     };
-    // Gravity
     let gravitySelect = document.getElementById("gravitySelect");
     gravitySelect.onchange = function () {
         _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_4__["default"].gravity = parseFloat(gravitySelect.value);
     };
-    // Jump
     let jumpSelect = document.getElementById("jumpSelect");
     jumpSelect.onchange = () => {
         _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_4__["default"].playerJump = parseFloat(jumpSelect.value);
     };
-    // Speed
     let speedSelect = document.getElementById("speedSelect");
     speedSelect.onchange = () => {
         _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_4__["default"].playerSpeed = parseFloat(speedSelect.value);
     };
-    // Density
     let densitySelect = document.getElementById("densitySelect");
     densitySelect.onchange = () => {
         _scene_SceneAttributes__WEBPACK_IMPORTED_MODULE_4__["default"].levelDensity = parseFloat(densitySelect.value);
     };
-    // Generate Level
     let startButton = document.getElementById("generateLevelButton");
     startButton.onclick = () => {
         document.body.innerHTML = "";
         BeginGame();
     };
-    //BeginGame();
 }
 function BeginGame() {
     let canvas = document.createElement("canvas");
@@ -6093,17 +6040,14 @@ function BeginGame() {
     document.body.appendChild(winText);
     let backBtn = document.createElement("button");
     backBtn.id = "backButton";
-    backBtn.textContent = "";
+    backBtn.textContent = "Chơi lại";
     backBtn.onclick = () => location.reload();
     document.body.appendChild(backBtn);
-    // get canvas and webgl context
-    //const canvas = <HTMLCanvasElement> document.getElementById('canvas');
     const gl = canvas.getContext('webgl2');
     if (!gl) {
         alert('Trình duyệt không hỗ trợ WebGL 2!');
     }
     (0,_globals__WEBPACK_IMPORTED_MODULE_0__.setGL)(gl);
-    // Initial display for framerate (only for development)
     let displayStats = false;
     const stats = Stats();
     if (window.location.hostname === "localhost") {
@@ -6122,8 +6066,6 @@ function BeginGame() {
     engine.generateLevel();
     let player = new _scene_Player__WEBPACK_IMPORTED_MODULE_3__["default"]([0, 1]);
     camera.makeParent(player);
-    //new RhythmGropuGenerator(20, 20, 0.5, 0.6, [1, 0, 0]).generateRhythmGroup();
-    // This function will be called every frame
     function tick() {
         if (displayStats) {
             stats.begin();
@@ -6143,7 +6085,6 @@ function BeginGame() {
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
         _engine_GameEngine__WEBPACK_IMPORTED_MODULE_2__["default"].getEngine().drawGameObjects();
-        // Tell the browser to call `tick` again whenever it renders a new frame
         if (displayStats) {
             stats.end();
         }
@@ -6157,7 +6098,6 @@ function BeginGame() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();
-    // Start the render loop
     engine.startGame();
     tick();
 }

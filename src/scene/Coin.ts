@@ -49,7 +49,6 @@ class Coin extends GameObject {
             return spriteCoordinates.SPRITE_COIN_4;
         }
         else if (this.animationFrame < ANIMATION_FRAME_LENGTH * 5) {
-            //this.direction = this.direction = -1;
             return spriteCoordinates.SPRITE_COIN_5;
         }
         else if (this.animationFrame < ANIMATION_FRAME_LENGTH * 6) {

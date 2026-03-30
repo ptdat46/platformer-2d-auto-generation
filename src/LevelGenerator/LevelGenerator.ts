@@ -28,7 +28,6 @@ export default class LevelGenerator {
         this.terrain = _terrain;
         this.rhythmGroups = [];
 
-        // Create the rhythm generator
         this.groupGenerator = new RhythmGroupGenerator(
             minGroupDuration,
             maxGroupDuration,
@@ -37,7 +36,6 @@ export default class LevelGenerator {
             beatFrequencies
         );
 
-        // Create the geometry generator
         this.geometryGenerator = new GeometryGenerator(this.terrain);
     }
 

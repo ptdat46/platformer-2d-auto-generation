@@ -30,7 +30,6 @@ float worley(vec2 noisePos, float frequency) {
     vec2 point = noisePos * frequency;
     vec2 cell = floor(point);
 
-    // Check the neighboring cells for the closest cell point
     float closestDistance = 2.0;
     for (int i = 0; i < 9; i++) {
         vec2 curCell = cell + vec2(i % 3 - 1, floor(float(i / 3) - 1.0));
@@ -43,17 +42,14 @@ float worley(vec2 noisePos, float frequency) {
 float brownianNoise(vec2 noisePos, vec2 seed) {
     vec2 boxPos = vec2(floor(noisePos.x), floor(noisePos.y));
 
-    // Get the noise at the corners of the cells
     float corner0 = random1(boxPos + vec2(0.0, 0.0));
     float corner1 = random1(boxPos + vec2(1.0, 0.0));
     float corner2 = random1(boxPos + vec2(0.0, 1.0));
     float corner3 = random1(boxPos + vec2(1.0, 1.0));
 
-    // Get cubic interpolation factors
     float tx = smoothstep(0.0, 1.0, fract(noisePos.x));
     float ty = smoothstep(0.0, 1.0, fract(noisePos.y));
 
-    // Perform bicubic interpolation
     return mix(mix(corner0, corner1, tx), mix(corner2, corner3, tx), ty);
 }
 

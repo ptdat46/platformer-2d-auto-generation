@@ -8,22 +8,11 @@ const WALK_CYCLE_LENGTH: number = 10;
 
 class Player extends GameObject {
 
-    // Whether or not the player is affecting their jump by holding the jump button
     jumping: boolean;
-
-    // The amount of time the player has been holding the jump button
     jumpTime: number;
-
-    // Prevents the player from regrounding the frist frame of a jump
     groundedImmunity: boolean;
-
-    // The direction the player is currently facing: 1 for right, -1 for left
     direction: number;
-
-    // The current frame of the player's walk cycle
     walkFrame: number;
-
-    // Whether or not the player is moving horizontally
     moving: boolean;
 
     aPressed: boolean;
@@ -74,8 +63,6 @@ class Player extends GameObject {
             }
         }
         if (this.jumping) {
-            // I have decided to perform this operation in units of frames instead of seconds to ensure
-            // that the jump height is consistent. It makes geometry generator calculations easier too
             this.jumpTime -= 0.016;
             let t = Math.max(0, this.jumpTime / 0.4);
             this.inputVelocity[1] = t * sceneAttributes.playerJump;

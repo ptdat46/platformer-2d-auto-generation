@@ -4,7 +4,6 @@ import Camera from '../../Camera';
 import {gl} from '../../globals';
 import ShaderProgram from './ShaderProgram';
 
-// In this file, `gl` is accessible because it is imported above
 class OpenGLRenderer {
     constructor(public canvas: HTMLCanvasElement) {
         gl.enable(gl.DEPTH_TEST);

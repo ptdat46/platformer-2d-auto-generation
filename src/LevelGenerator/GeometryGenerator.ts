@@ -64,21 +64,9 @@ export default class GeometryGenerator {
         return {moveStates: movement, jumpStates: jumps};
     }
 
-    // Calculate the height of a jump when the jump button is held for a specified amount of time
-    // Also find the time it takes to get to that height
     private getJumpHeight(jumpHold: number): {height: number, time: number} {
-        // This is, at its core, a ballistics problem. However, it's complicated by the fact
-        // that the velocity is controlled by the player even after the jump begins. This means 
-        // that to find the max height, we have to separate the jump into 2 parts: the part 
-        // where the jump key is being held, and the part afterward. We have to find the height
-        // and upward velocity acheived at the end of the first part, and then the second part
-        // just becomes a simple physics problem. Getting those vectors will rely heavily on the
-        // jumping implementation though.
         let gravity = sceneAttributes.gravity;
         let jumpVel = sceneAttributes.playerJump;
-
-        // To simplify the math (and because it wouldn't be entirely accurate anyway)
-        // I am just going to simulate jumping (assuming perfect framerate)
         let vel = 0;
         let inputvel = 0;
         let pos = 0;
@@ -191,7 +179,7 @@ export default class GeometryGenerator {
         let totalDistance = Math.floor(sceneAttributes.playerSpeed * totalFrames / 60);
         let peakDistance = Math.floor(sceneAttributes.playerSpeed * height.time);
 
-        let spikeGapOffset = 1; // khoảng cách thêm giữa gai trên và dưới
+        let spikeGapOffset = 1;
         for (let jump of this.jumpHeights.keys()) {
             if (jumpType != jump) {
                 new Spike([

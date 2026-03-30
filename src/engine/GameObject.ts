@@ -85,9 +85,7 @@ abstract class GameObject {
         }
 
         let prevVelocity: vec2 = this.velocity;
-        //this.velocity = vec2.fromValues(0, 0);
 
-        // Apply gravity
         if (this.grounded) {
             this.velocity[1] = 0;
         }
@@ -95,7 +93,6 @@ abstract class GameObject {
             this.velocity[1] -= sceneAttributes.gravity;
         }
 
-        // Apply non-physical motion
         if (Math.abs(this.inputVelocity[0]) > 0.001) {
             let influence = this.grounded ? 0.2 : 0.11;
             this.velocity[0] = (1 - influence) * this.velocity[0] + influence * this.inputVelocity[0];
@@ -107,21 +104,11 @@ abstract class GameObject {
             this.velocity[0] *= 0.95;
         }
         this.velocity[1] += this.inputVelocity[1];
-        // Scale back velocity if it's too high
         let speed: number = vec2.length(this.velocity);
         if (speed > sceneAttributes.maxObjectSpeed) {
             vec2.scale(this.velocity, this.velocity, sceneAttributes.maxObjectSpeed / speed);
         }
 
-        // Update the object position, accounting for collisions
-        // We assume that before applying any motion this frame, the object is not intersecting anything
-        // We will use the following technique to do this:
-        //   - Apply the velocity vector to our position in the x axis only
-        //   - Check if, in this new position, the object intersects with the terrain (in all axes)
-        //   - If the object is now intersecting with a tile, we respond by pushing back the object by
-        //     the amount of the overlap
-        //     - Note that this pushback will only have to be in the x axis
-        //   - Repeat with the y-axis
         let deltaPos: vec2 = vec2.scale(vec2.create(), this.velocity, 1.0 / 60);
         this.goCollide = false;
         for (let axis = 0; axis < 2; axis++) {
@@ -208,7 +195,6 @@ abstract class GameObject {
         let pX = this.position[0];
         let pY = this.position[1];
 
-        // Anti-frustration feature
         if (other.constructor.name === "Spike" || other.constructor.name === "Baddie") {
             tX += 0.5;
             tY += 0.5;
@@ -255,8 +241,6 @@ abstract class GameObject {
     }
 
     private checkIfGrounded(): boolean {
-
-        // Check if we would be colliding with a block if we were just a teensy bit lower
         let newPos: vec2 = vec2.subtract(vec2.create(), this.position, vec2.fromValues(0, 0.05));
         let gridPosition: vec2 = vec2.fromValues(
             Math.floor(newPos[0]),
@@ -295,13 +279,10 @@ abstract class GameObject {
         return false;
     }
 
-    onUpdate(delta: number): void {/* Please implement me*/};
-
-    onKeyPress(key: string): void {/* Or don't */};
-
-    onKeyDown(key: string): void {/* I don't really care too much at this point */};
-
-    onKeyUp(key: string): void {/* I'm just holding out til graduation at this point */}
+    onUpdate(delta: number): void {};
+    onKeyPress(key: string): void {};
+    onKeyDown(key: string): void {};
+    onKeyUp(key: string): void {}
 
     protected onGrounded(verticalVelocity: number): void {}
 

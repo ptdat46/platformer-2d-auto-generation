@@ -20,13 +20,11 @@ let gameStart: boolean = false;
 
 function main() {
 
-    // Rhythm Type
     let rhythmTypeSelect = <HTMLSelectElement> document.getElementById("rhythmSelect");
     rhythmTypeSelect.onchange = () => {
         sceneAttributes.rhythmType = parseInt(rhythmTypeSelect.value);
     }
 
-    // Rhythm Group Length
     let groupLengthSlider = <HTMLInputElement> document.getElementById("timeSelect");
     let groupLengthOutput = document.getElementById("timeSelectDisplay");
     groupLengthOutput.innerHTML = groupLengthSlider.value + " giây";
@@ -35,7 +33,6 @@ function main() {
         sceneAttributes.rhythmGroupLength = parseInt(groupLengthSlider.value);
     }
 
-    // Rhythm Group Number
     let groupNumberSelect = <HTMLInputElement> document.getElementById("numberSelect");
     let groupNumberOutput = document.getElementById("numberDisplay");
     groupNumberOutput.innerHTML = groupNumberSelect.value;
@@ -44,38 +41,32 @@ function main() {
         sceneAttributes.numberOfGroups = parseInt(groupNumberSelect.value);
     }
 
-    // Gravity
     let gravitySelect = <HTMLSelectElement> document.getElementById("gravitySelect");
     gravitySelect.onchange = function() {
         sceneAttributes.gravity = parseFloat(gravitySelect.value);
     }
 
-    // Jump
     let jumpSelect = <HTMLSelectElement> document.getElementById("jumpSelect");
     jumpSelect.onchange = () => {
         sceneAttributes.playerJump = parseFloat(jumpSelect.value);
     }
 
-    // Speed
     let speedSelect = <HTMLSelectElement> document.getElementById("speedSelect");
     speedSelect.onchange = () => {
         sceneAttributes.playerSpeed = parseFloat(speedSelect.value);
     }
 
-    // Density
     let densitySelect = <HTMLSelectElement> document.getElementById("densitySelect");
     densitySelect.onchange = () => {
         sceneAttributes.levelDensity = parseFloat(densitySelect.value);
     }
 
-    // Generate Level
     let startButton = <HTMLButtonElement> document.getElementById("generateLevelButton");
     startButton.onclick = () => {
         document.body.innerHTML = "";
         BeginGame();
     }
 
-    //BeginGame();
 }
 
 function BeginGame() {
@@ -91,19 +82,16 @@ function BeginGame() {
 
     let backBtn = document.createElement("button");
     backBtn.id = "backButton";
-    backBtn.textContent = "";
+    backBtn.textContent = "Chơi lại";
     backBtn.onclick = () => location.reload();
     document.body.appendChild(backBtn);
 
-    // get canvas and webgl context
-    //const canvas = <HTMLCanvasElement> document.getElementById('canvas');
     const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
     if (!gl) {
         alert('Trình duyệt không hỗ trợ WebGL 2!');
     }
     setGL(gl);
 
-    // Initial display for framerate (only for development)
     let displayStats = false;
     const stats = Stats();
     if (window.location.hostname === "localhost") {
@@ -124,9 +112,6 @@ function BeginGame() {
     engine.generateLevel();
     let player: Player = new Player([0, 1]);
     camera.makeParent(player);
-    //new RhythmGropuGenerator(20, 20, 0.5, 0.6, [1, 0, 0]).generateRhythmGroup();
-
-    // This function will be called every frame
     function tick() {
         if (displayStats) {
             stats.begin();
@@ -150,7 +135,6 @@ function BeginGame() {
         renderer.clear();
         GameEngine.getEngine().drawGameObjects();
     
-        // Tell the browser to call `tick` again whenever it renders a new frame
         if (displayStats) {
             stats.end();
         }
@@ -167,7 +151,6 @@ function BeginGame() {
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();
 
-    // Start the render loop
     engine.startGame();
     tick();
 }

@@ -17,7 +17,7 @@ abstract class Drawable {
     mirGenerated: boolean = false;
     scaleGenerated: boolean = false;
   
-    numInstances: number = 0; // How many instances of this Drawable the shader program should draw
+    numInstances: number = 0;
   
     abstract create() : void;
 

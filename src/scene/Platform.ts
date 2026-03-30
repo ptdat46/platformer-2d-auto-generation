@@ -1,7 +1,6 @@
 import {vec2, vec3} from 'gl-matrix';
 import GameObject from '../engine/GameObject';
 
-// This was a failed experiment. Please ignore any mention of this class in the codebase
 
 export default class Platform extends GameObject {
 
