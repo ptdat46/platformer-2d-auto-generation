@@ -84,6 +84,17 @@ function BeginGame() {
 
     document.body.appendChild(canvas);
 
+    let winText = document.createElement("div");
+    winText.id = "winText";
+    winText.textContent = "Chiến thắng";
+    document.body.appendChild(winText);
+
+    let backBtn = document.createElement("button");
+    backBtn.id = "backButton";
+    backBtn.textContent = "";
+    backBtn.onclick = () => location.reload();
+    document.body.appendChild(backBtn);
+
     // get canvas and webgl context
     //const canvas = <HTMLCanvasElement> document.getElementById('canvas');
     const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
@@ -122,6 +133,18 @@ function BeginGame() {
         }
         time++;
         engine.tick();
+
+        if (GameEngine.getEngine().isWin()) {
+            let winEl = document.getElementById("winText") as HTMLElement;
+            winEl.style.opacity = "1";
+            winEl.classList.add("active");
+
+            let backBtn = document.getElementById("backButton") as HTMLElement;
+            backBtn.style.top = "calc(50% + 60px)";
+            backBtn.style.left = "50%";
+            backBtn.style.right = "auto";
+            backBtn.style.transform = "translateX(-50%)";
+        }
 
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();

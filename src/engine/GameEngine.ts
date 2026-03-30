@@ -4,6 +4,7 @@ import Terrain from '../scene/Terrain';
 import Coin from '../scene/Coin';
 import Particle from '../scene/Particle';
 import Baddie from '../scene/Baddie';
+import Gem from '../scene/Gem';
 import Tile from '../geometry/Tile';
 import Background from '../geometry/Background';
 import {gl} from '../globals';
@@ -78,6 +79,17 @@ class GameEngine {
                 this.gameObjects.forEach((go: GameObject) => {go.onKeyDown(keyEvent.key)});
             }
             this.downkeys.add(keyEvent.key);
+
+            // [DEBUG] Phím G: spawn gem ngay tại vị trí player (để test đoạn cuối)
+            if (keyEvent.key === 'g' || keyEvent.key === 'G') {
+                for (let go of this.gameObjects) {
+                    if (go.constructor.name === "Player") {
+                        let pos = go.getPosition();
+                        new Gem([pos[0] + 2, pos[1] + 1]);
+                        break;
+                    }
+                }
+            }
         });
         window.addEventListener("keyup", (keyEvent) => {
             this.downkeys.delete(keyEvent.key);
@@ -125,6 +137,10 @@ class GameEngine {
 
     onWin() {
         this.win = true;
+    }
+
+    isWin(): boolean {
+        return this.win;
     }
 
     drawGameObjects() {

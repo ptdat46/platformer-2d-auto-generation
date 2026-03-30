@@ -85,19 +85,18 @@ void main() {
     vec4 layer2 = texture(u_SpriteTex, uv2);
 
     if (u_Win == 1) {
-        float t1 = cos(fs_Pos[0] + fs_Pos[1] + u_Time * 0.01);
-        float t2 = (sin(-2.0 * fs_Pos[1] + u_Time * 0.01) * cos(2.0 * fs_Pos[0] + u_Time * 0.01));
+        float breathe = 0.5 + 0.5 * sin(u_Time * 0.03);
+        float wave = 0.5 + 0.5 * sin(u_Time * 0.02 + fs_Pos[0] * 0.5 + fs_Pos[1] * 0.3);
 
-        float t3 = pow(fbm(fs_Pos - vec2(u_Time * 0.005) + vec2(
-            fbm(fs_Pos + vec2(u_Time * 0.001), 2, 2.5),
-            worley(fs_Pos, 10.0)
-        ), 
-        3, 5.0), 2.0);
+        vec3 skyColor = mix(
+            mix(vec3(0.1, 0.05, 0.3), vec3(0.0, 0.6, 1.0), wave),
+            mix(vec3(1.0, 0.3, 0.6), vec3(1.0, 0.9, 0.2), wave),
+            breathe
+        );
 
-        layer1.rgb = palette(t1, vec3(0.5), vec3(0.5), vec3(1), vec3(0, 0.33, 0.67)) * 0.2;
-        layer2.rgb = palette(t2, vec3(0.5), vec3(0.5), vec3(1), vec3(0, 0.33, 0.67)) * 0.4;
-        vec3 skyColor = palette(t3, vec3(0.5), vec3(0.5), vec3(1), vec3(0, 0.33, 0.67)) * 0.8;
-        sky.rgb = worley(fs_Pos, 10.0) < starRadius ? vec3(1) - skyColor : skyColor;
+        layer1.rgb = mix(layer1.rgb, vec3(0.8, 0.9, 1.0), 0.3);
+        layer2.rgb = mix(layer2.rgb, vec3(0.9, 0.95, 1.0), 0.3);
+        sky.rgb = skyColor;
     }
 
     vec4 color = 

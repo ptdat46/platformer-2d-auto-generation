@@ -1,9 +1,9 @@
-import {vec2, vec3} from 'gl-matrix';
+import {vec2} from 'gl-matrix';
 import GameObject from '../engine/GameObject';
 import GameEngine from '../engine/GameEngine';
-import sceneAttributes from './SceneAttributes';
 import Particle from './Particle';
 import {spriteCoordinates} from '../constants';
+import WinEffectManager from './WinEffectManager';
 
 export default class Gem extends GameObject {
 
@@ -35,6 +35,8 @@ export default class Gem extends GameObject {
 
     onCollision(other: GameObject) {
         if (other.constructor.name === "Player") {
+            let manager = new WinEffectManager();
+            manager.isActive = true;
             GameEngine.getEngine().onWin();
             this.destroy();
         }
