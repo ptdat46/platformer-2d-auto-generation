@@ -1,4 +1,4 @@
-/******/ (() => { // webpackBootstrap
+/******/ (() => {
 /******/ 	var __webpack_modules__ = ([
 /* 0 */,
 /* 1 */
@@ -331,7 +331,6 @@ function identity(out) {
  * @returns {mat4} out
  */
 function transpose(out, a) {
-  // If we are transposing ourselves we can skip a few steps but have to cache some values
   if (out === a) {
     var a01 = a[1],
       a02 = a[2],
@@ -409,7 +408,6 @@ function invert(out, a) {
   var b10 = a21 * a33 - a23 * a31;
   var b11 = a22 * a33 - a23 * a32;
 
-  // Calculate the determinant
   var det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
   if (!det) {
     return null;
@@ -523,7 +521,6 @@ function determinant(a) {
   var b8 = a20 * b2 - a21 * b1 + a22 * b0;
   var b9 = a30 * b2 - a31 * b1 + a32 * b0;
 
-  // Calculate the determinant
   return a13 * b6 - a03 * b7 + a33 * b8 - a23 * b9;
 }
 
@@ -553,7 +550,6 @@ function multiply(out, a, b) {
     a32 = a[14],
     a33 = a[15];
 
-  // Cache only the current line of the second matrix
   var b0 = b[0],
     b1 = b[1],
     b2 = b[2],
@@ -717,7 +713,6 @@ function rotate(out, a, rad, axis) {
   a22 = a[10];
   a23 = a[11];
 
-  // Construct the elements of the rotation matrix
   b00 = x * x * t + c;
   b01 = y * x * t + z * s;
   b02 = z * x * t - y * s;
@@ -728,7 +723,6 @@ function rotate(out, a, rad, axis) {
   b21 = y * z * t - x * s;
   b22 = z * z * t + c;
 
-  // Perform rotation-specific matrix multiplication
   out[0] = a00 * b00 + a10 * b01 + a20 * b02;
   out[1] = a01 * b00 + a11 * b01 + a21 * b02;
   out[2] = a02 * b00 + a12 * b01 + a22 * b02;
@@ -742,7 +736,6 @@ function rotate(out, a, rad, axis) {
   out[10] = a02 * b20 + a12 * b21 + a22 * b22;
   out[11] = a03 * b20 + a13 * b21 + a23 * b22;
   if (a !== out) {
-    // If the source and destination differ, copy the unchanged last row
     out[12] = a[12];
     out[13] = a[13];
     out[14] = a[14];
@@ -771,7 +764,6 @@ function rotateX(out, a, rad) {
   var a22 = a[10];
   var a23 = a[11];
   if (a !== out) {
-    // If the source and destination differ, copy the unchanged rows
     out[0] = a[0];
     out[1] = a[1];
     out[2] = a[2];
@@ -782,7 +774,6 @@ function rotateX(out, a, rad) {
     out[15] = a[15];
   }
 
-  // Perform axis-specific matrix multiplication
   out[4] = a10 * c + a20 * s;
   out[5] = a11 * c + a21 * s;
   out[6] = a12 * c + a22 * s;
@@ -814,7 +805,6 @@ function rotateY(out, a, rad) {
   var a22 = a[10];
   var a23 = a[11];
   if (a !== out) {
-    // If the source and destination differ, copy the unchanged rows
     out[4] = a[4];
     out[5] = a[5];
     out[6] = a[6];
@@ -825,7 +815,6 @@ function rotateY(out, a, rad) {
     out[15] = a[15];
   }
 
-  // Perform axis-specific matrix multiplication
   out[0] = a00 * c - a20 * s;
   out[1] = a01 * c - a21 * s;
   out[2] = a02 * c - a22 * s;
@@ -857,7 +846,6 @@ function rotateZ(out, a, rad) {
   var a12 = a[6];
   var a13 = a[7];
   if (a !== out) {
-    // If the source and destination differ, copy the unchanged last row
     out[8] = a[8];
     out[9] = a[9];
     out[10] = a[10];
@@ -868,7 +856,6 @@ function rotateZ(out, a, rad) {
     out[15] = a[15];
   }
 
-  // Perform axis-specific matrix multiplication
   out[0] = a00 * c + a10 * s;
   out[1] = a01 * c + a11 * s;
   out[2] = a02 * c + a12 * s;
@@ -971,7 +958,6 @@ function fromRotation(out, rad, axis) {
   c = Math.cos(rad);
   t = 1 - c;
 
-  // Perform rotation-specific matrix multiplication
   out[0] = x * x * t + c;
   out[1] = y * x * t + z * s;
   out[2] = z * x * t - y * s;
@@ -1006,7 +992,6 @@ function fromXRotation(out, rad) {
   var s = Math.sin(rad);
   var c = Math.cos(rad);
 
-  // Perform axis-specific matrix multiplication
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -1041,7 +1026,6 @@ function fromYRotation(out, rad) {
   var s = Math.sin(rad);
   var c = Math.cos(rad);
 
-  // Perform axis-specific matrix multiplication
   out[0] = c;
   out[1] = 0;
   out[2] = -s;
@@ -1076,7 +1060,6 @@ function fromZRotation(out, rad) {
   var s = Math.sin(rad);
   var c = Math.cos(rad);
 
-  // Perform axis-specific matrix multiplication
   out[0] = c;
   out[1] = s;
   out[2] = 0;
@@ -1112,7 +1095,6 @@ function fromZRotation(out, rad) {
  * @returns {mat4} out
  */
 function fromRotationTranslation(out, q, v) {
-  // Quaternion math
   var x = q[0],
     y = q[1],
     z = q[2],
@@ -1166,7 +1148,6 @@ function fromQuat2(out, a) {
     az = a[6],
     aw = a[7];
   var magnitude = bx * bx + by * by + bz * bz + bw * bw;
-  //Only scale if it makes sense
   if (magnitude > 0) {
     translation[0] = (ax * bw + aw * bx + ay * bz - az * by) * 2 / magnitude;
     translation[1] = (ay * bw + aw * by + az * bx - ax * bz) * 2 / magnitude;
@@ -1361,7 +1342,6 @@ function decompose(out_r, out_t, out_s, mat) {
  * @returns {mat4} out
  */
 function fromRotationTranslationScale(out, q, v, s) {
-  // Quaternion math
   var x = q[0],
     y = q[1],
     z = q[2],
@@ -1421,7 +1401,6 @@ function fromRotationTranslationScale(out, q, v, s) {
  * @returns {mat4} out
  */
 function fromRotationTranslationScaleOrigin(out, q, v, s, o) {
-  // Quaternion math
   var x = q[0],
     y = q[1],
     z = q[2],
@@ -2108,16 +2087,12 @@ __webpack_require__.r(__webpack_exports__);
  * @module glMatrix
  */
 
-// Configuration Constants
 var EPSILON = 0.000001;
 var ARRAY_TYPE = typeof Float32Array !== "undefined" ? Float32Array : Array;
 var RANDOM = Math.random;
 var ANGLE_ORDER = "zyx";
 
 /**
- * Symmetric round
- * see https://www.npmjs.com/package/round-half-up-symmetric#user-content-detailed-background
- *
  * @param {Number} a value to round
  */
 function round(a) {
@@ -2662,9 +2637,6 @@ function lerp(out, a, b, t) {
 function random(out, scale) {
   scale = scale === undefined ? 1.0 : scale;
 
-  // Marsaglia, George. Choosing a Point from the Surface of a
-  // Sphere. Ann. Math. Statist. 43 (1972), no. 2, 645--646.
-  // http://projecteuclid.org/euclid.aoms/1177692644;
   var v1, v2, v3, v4;
   var s1, s2;
   var rand;
@@ -2713,8 +2685,6 @@ function transformMat4(out, a, m) {
  * @returns {vec4} out
  */
 function transformQuat(out, a, q) {
-  // Fast Vector Rotation using Quaternions by Robert Eisele
-  // https://raw.org/proof/vector-rotation-using-quaternions/
 
   var qx = q[0],
     qy = q[1],
@@ -2724,17 +2694,14 @@ function transformQuat(out, a, q) {
     vy = a[1],
     vz = a[2];
 
-  // t = q x v
   var tx = qy * vz - qz * vy;
   var ty = qz * vx - qx * vz;
   var tz = qx * vy - qy * vx;
 
-  // t = 2t
   tx = tx + tx;
   ty = ty + ty;
   tz = tz + tz;
 
-  // v + w t + q x t
   out[0] = vx + qw * tx + qy * tz - qz * ty;
   out[1] = vy + qw * ty + qz * tx - qx * tz;
   out[2] = vz + qw * tz + qx * ty - qy * tx;
@@ -3696,7 +3663,6 @@ function normalize(out, a) {
     y = a[1];
   var len = x * x + y * y;
   if (len > 0) {
-    //TODO: evaluate use of glm_invsqrt here?
     len = 1 / Math.sqrt(len);
   }
   out[0] = a[0] * len;
@@ -3839,13 +3805,11 @@ function transformMat4(out, a, m) {
  * @returns {vec2} out
  */
 function rotate(out, a, b, rad) {
-  //Translate point to the origin
   var p0 = a[0] - b[0],
     p1 = a[1] - b[1],
     sinC = Math.sin(rad),
     cosC = Math.cos(rad);
 
-  //perform rotation and translate to correct position
   out[0] = p0 * cosC - p1 * sinC + b[0];
   out[1] = p0 * sinC + p1 * cosC + b[1];
   return out;
@@ -5912,34 +5876,25 @@ class Player extends _engine_GameObject__WEBPACK_IMPORTED_MODULE_0__["default"] 
 /***/ })
 /******/ 	]);
 /************************************************************************/
-/******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
+/******/
 /******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
 /******/ 		var cachedModule = __webpack_module_cache__[moduleId];
 /******/ 		if (cachedModule !== undefined) {
 /******/ 			return cachedModule.exports;
 /******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
+/******/
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
+/******/
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
 /******/ 		__webpack_require__.d = (exports, definition) => {
 /******/ 			for(var key in definition) {
 /******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
@@ -5948,15 +5903,14 @@ class Player extends _engine_GameObject__WEBPACK_IMPORTED_MODULE_0__["default"] 
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
-/******/ 		// define __esModule on exports
 /******/ 		__webpack_require__.r = (exports) => {
 /******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
@@ -5972,7 +5926,6 @@ class Player extends _engine_GameObject__WEBPACK_IMPORTED_MODULE_0__["default"] 
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -6107,4 +6060,3 @@ main();
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.js.map
