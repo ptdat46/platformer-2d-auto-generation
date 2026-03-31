@@ -70,6 +70,28 @@ class Terrain {
         }
     }
 
+    serialize(): { tiles: {x: number; y: number}[]; randomOffset: number } {
+        const tiles: {x: number; y: number}[] = [];
+        for (const x of this.tiles.keys()) {
+            for (const y of this.tiles.get(x)) {
+                tiles.push({ x, y });
+            }
+        }
+        return { tiles, randomOffset: this.randomOffset };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    deserialize(data: any): void {
+        this.tiles = new Map();
+        this.randomOffset = data.randomOffset;
+        for (const { x, y } of data.tiles) {
+            if (!this.tiles.has(x)) {
+                this.tiles.set(x, new Set());
+            }
+            this.tiles.get(x).add(y);
+        }
+    }
+
     getSpritePosition(x: number, y: number): vec2 {
         x = Math.floor(x);
         y = Math.floor(y);

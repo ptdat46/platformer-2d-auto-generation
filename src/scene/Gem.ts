@@ -7,9 +7,20 @@ import WinEffectManager from './WinEffectManager';
 
 export default class Gem extends GameObject {
 
+    private collected: boolean = false;
+
     constructor(pos: vec2 | number[]) {
         super(false, false, true);
         this.setPosition(pos);
+    }
+
+    isCollected(): boolean {
+        return this.collected;
+    }
+
+    markCollected(): void {
+        this.collected = true;
+        this.destroy();
     }
 
     getSpriteUv(): vec2 {
@@ -34,11 +45,11 @@ export default class Gem extends GameObject {
     }
 
     onCollision(other: GameObject) {
-        if (other.constructor.name === "Player") {
+        if (other.constructor.name === "Player" && !this.collected) {
             let manager = new WinEffectManager();
             manager.isActive = true;
             GameEngine.getEngine().onWin();
-            this.destroy();
+            this.markCollected();
         }
     }
 

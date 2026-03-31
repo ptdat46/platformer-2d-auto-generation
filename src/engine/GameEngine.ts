@@ -1,5 +1,6 @@
 import {vec2} from 'gl-matrix';
 import GameObject from './GameObject';
+import Player from '../scene/Player';
 import Terrain from '../scene/Terrain';
 import Coin from '../scene/Coin';
 import Particle from '../scene/Particle';
@@ -205,6 +206,46 @@ class GameEngine {
 
     getCollidableObjects() {
         return this.collidableObjects;
+    }
+
+    getGameObjects(): GameObject[] {
+        return this.gameObjects;
+    }
+
+    getPlayer(): GameObject | null {
+        for (const go of this.gameObjects) {
+            if (go instanceof Player) return go;
+        }
+        return null;
+    }
+
+    clearDynamicGameObjects(): void {
+        // Remove all non-terrain objects (they will be rebuilt from save data)
+        for (const go of [...this.gameObjects]) {
+            if (!(go instanceof Player)) {
+                go.destroy();
+            }
+        }
+        // Remove remaining (should only be player now)
+        for (const go of [...this.gameObjects]) {
+            go.destroy();
+        }
+        this.gameObjects = [];
+        this.collidableObjects = [];
+    }
+
+    loadPlayer(data: {
+        position: [number, number];
+        startPos: [number, number];
+        dead: boolean;
+        win: boolean;
+        direction: number;
+        grounded: boolean;
+    }): void {
+        const player = this.getPlayer();
+        if (player instanceof Player) {
+            player.deserialize(data);
+        }
     }
 
     private updateGameObjects(deltaTime: number) {

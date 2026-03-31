@@ -26,6 +26,14 @@ class Checkpoint extends GameObject {
         this.claimed = false;
     }
 
+    isClaimed(): boolean {
+        return this.claimed;
+    }
+
+    markClaimed(): void {
+        this.claimed = true;
+    }
+
     onUpdate(delta: number) {
         this.animationFrame = (this.animationFrame + 1) % (ANIMATION_FRAME_LENGTH * 3);
     }

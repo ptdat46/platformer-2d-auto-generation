@@ -38,6 +38,10 @@ class Baddie extends GameObject {
         this.translate([ENEMY_SPEED * 1.0 / 60 * this.direction, 0]);
     }
 
+    getDirection(): number {
+        return this.direction;
+    }
+
     getSpriteUv() {
         return this.animationFrame > ANIMATION_FRAME_LENGTH / 2 ? 
             spriteCoordinates.SPRITE_BADDIE_1:

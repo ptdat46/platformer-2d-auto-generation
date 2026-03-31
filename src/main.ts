@@ -1,4 +1,5 @@
 import {vec2, vec3} from 'gl-matrix';
+import SaveManager from './scene/SaveManager';
 
 import {setGL} from './globals';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
@@ -106,20 +107,127 @@ function BeginGame() {
     let engine: GameEngine = GameEngine.getEngine();
     const camera: Camera = engine.getCamera();
 
+    // ── Pause overlay ───────────────────────────────────────────────────────
+    let pauseOverlay: HTMLDivElement = document.createElement("div");
+    pauseOverlay.id = "pauseOverlay";
+    pauseOverlay.innerHTML = `
+        <style>
+            #pauseOverlay {
+                display: none;
+                position: fixed; inset: 0;
+                background: rgba(0,0,0,0.7);
+                justify-content: center; align-items: center;
+                flex-direction: column; gap: 12px;
+                z-index: 100;
+            }
+            #pauseOverlay.visible { display: flex; }
+            #pauseOverlay h2 {
+                color: #fff; font-family: sans-serif; margin: 0 0 8px;
+                font-size: 28px; letter-spacing: 2px;
+            }
+            #pauseOverlay button {
+                padding: 10px 28px; font-size: 16px; cursor: pointer;
+                border: none; border-radius: 6px;
+                background: #4CAF50; color: #fff;
+                min-width: 180px;
+            }
+            #pauseOverlay button:hover { background: #45a049; }
+            #pauseOverlay button.secondary { background: #555; }
+            #pauseOverlay button.secondary:hover { background: #666; }
+            #saveStatus {
+                color: #aaa; font-family: sans-serif; font-size: 13px;
+                margin-top: 4px;
+            }
+        </style>
+        <h2>TẠM DỪNG</h2>
+        <button id="btnResume">Tiếp Tục</button>
+        <button id="btnSave" class="secondary">Lưu Game</button>
+        <button id="btnReload" class="secondary">Chơi Lại</button>
+        <div id="saveStatus"></div>
+    `;
+    document.body.appendChild(pauseOverlay);
+
+    let paused = false;
+
+    function showPauseOverlay() {
+        paused = true;
+        let status = document.getElementById("saveStatus");
+        if (status) {
+            status.textContent = SaveManager.hasSave() ? "Đã có bản lưu" : "Chưa có bản lưu";
+        }
+        let btnSave = document.getElementById("btnSave") as HTMLButtonElement;
+        if (btnSave) btnSave.style.display = SaveManager.hasSave() ? "none" : "inline-block";
+        pauseOverlay.classList.add("visible");
+    }
+
+    function hidePauseOverlay() {
+        paused = false;
+        pauseOverlay.classList.remove("visible");
+        requestAnimationFrame(tick);
+    }
+
+    // Pause / resume on P
+    window.addEventListener("keydown", (e) => {
+        if ((e.key === "p" || e.key === "P") && !GameEngine.getEngine().isWin()) {
+            if (paused) hidePauseOverlay();
+            else showPauseOverlay();
+        }
+        if (e.key === "Escape" && paused) {
+            hidePauseOverlay();
+        }
+    });
+
+    document.getElementById("btnResume").onclick = hidePauseOverlay;
+
+    document.getElementById("btnSave").onclick = () => {
+        if (SaveManager.save()) {
+            let status = document.getElementById("saveStatus");
+            if (status) status.textContent = "Đã lưu!";
+            let btnSave = document.getElementById("btnSave") as HTMLButtonElement;
+            if (btnSave) btnSave.style.display = "none";
+        }
+    };
+
+    document.getElementById("btnReload").onclick = () => {
+        SaveManager.stopAutoSave();
+        SaveManager.deleteSave();
+        location.reload();
+    };
+
     const renderer = new OpenGLRenderer(canvas);
     renderer.setClearColor(0.9, 0.9, 0.9, 1);
     engine.setRenderer(renderer);
-    engine.generateLevel();
-    let player: Player = new Player([0, 1]);
-    camera.makeParent(player);
+
+    // ── Auto-load saved game ──────────────────────────────────────────────────
+    let shouldLoadSave = SaveManager.hasSave();
+
+    if (shouldLoadSave) {
+        // Load clears existing objects, rebuilds from save, starts engine + auto-save
+        SaveManager.load();
+        SaveManager.startAutoSave();
+    } else {
+        // Fresh new game
+        engine.generateLevel();
+        let player: Player = new Player([0, 1]);
+        camera.makeParent(player);
+        SaveManager.startAutoSave();
+    }
+
+    let gameEnded = false;
+    let rafId: number = 0;
     function tick() {
+        // When paused, stop the loop; hidePauseOverlay restarts it
+        if (paused) return;
+
         if (displayStats) {
             stats.begin();
         }
         time++;
         engine.tick();
 
-        if (GameEngine.getEngine().isWin()) {
+        if (!gameEnded && GameEngine.getEngine().isWin()) {
+            gameEnded = true;
+            SaveManager.stopAutoSave();
             let winEl = document.getElementById("winText") as HTMLElement;
             winEl.style.opacity = "1";
             winEl.classList.add("active");
@@ -134,19 +242,19 @@ function BeginGame() {
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
         GameEngine.getEngine().drawGameObjects();
-    
+
         if (displayStats) {
             stats.end();
         }
-        requestAnimationFrame(tick);
+        rafId = requestAnimationFrame(tick);
     }
-  
+
     window.addEventListener('resize', function() {
         renderer.setSize(window.innerWidth, window.innerHeight);
         camera.setAspectRatio(window.innerWidth / window.innerHeight);
         camera.updateProjectionMatrix();
     }, false);
-  
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();

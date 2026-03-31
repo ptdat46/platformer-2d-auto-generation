@@ -9,6 +9,7 @@ const ANIMATION_FRAME_LENGTH: number = 5;
 class Coin extends GameObject {
 
     animationFrame: number;
+    private collected: boolean = false;
 
     constructor(pos: vec2 | number[]) {
         super(false, true, true);
@@ -17,7 +18,17 @@ class Coin extends GameObject {
         this.direction = 1;
     }
 
+    isCollected(): boolean {
+        return this.collected;
+    }
+
+    markCollected(): void {
+        this.collected = true;
+        this.destroy();
+    }
+
     onUpdate(delta: number) {
+        if (this.collected) return;
         this.animationFrame = (this.animationFrame + 1) % (ANIMATION_FRAME_LENGTH * 8);
         if (Math.random() < 0.01) {
             let sparkle = new Particle(

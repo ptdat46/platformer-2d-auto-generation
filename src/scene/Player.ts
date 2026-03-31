@@ -3,6 +3,11 @@ import GameObject from '../engine/GameObject';
 import sceneAttributes from './SceneAttributes';
 import Particle from './Particle';
 import {spriteCoordinates} from '../constants';
+import Coin from './Coin';
+import Spike from './Spike';
+import Checkpoint from './Checkpoint';
+import Gem from './Gem';
+import Baddie from './Baddie';
 
 const WALK_CYCLE_LENGTH: number = 10;
 
@@ -218,7 +223,7 @@ class Player extends GameObject {
     }
 
     onCollision(other: GameObject) {
-        if (other.constructor.name === "Coin") {
+        if (other instanceof Coin) {
             for (let i = 0; i < 8; i++) {
                 let angle = i * Math.PI * 2 / 8;
                 let direction = vec2.fromValues(Math.cos(angle), Math.sin(angle));
@@ -232,15 +237,21 @@ class Player extends GameObject {
                     return vec2.scale(vec2.create(), direction, time * 2);
                 })
             }
-            other.destroy();
+            other.markCollected();
         }
-        else if (other.constructor.name === "Spike" || other.constructor.name === "Baddie") {
+        else if (other instanceof Spike || other instanceof Baddie) {
             this.dead = true;
         }
-        else if (other.constructor.name === "Checkpoint") {
+        else if (other instanceof Checkpoint) {
+            if (!other.isClaimed()) {
+                other.markClaimed();
+                if ((window as any).__onCheckpointClaimed) {
+                    ((window as any).__onCheckpointClaimed as () => void)();
+                }
+            }
             vec2.copy(this.startPos, other.getPosition());
         }
-        else if (other.constructor.name === "Gem") {
+        else if (other instanceof Gem) {
             this.win = true;
         }
     }
@@ -249,6 +260,29 @@ class Player extends GameObject {
         this.setPosition(this.startPos);
         this.dead = false;
         this.dynamic = true;
+        this.deathTimer = 0;
+    }
+
+    serialize(): { position: [number, number]; startPos: [number, number]; dead: boolean; win: boolean; direction: number; grounded: boolean } {
+        return {
+            position: [this.getPosition()[0], this.getPosition()[1]] as [number, number],
+            startPos: [this.startPos[0], this.startPos[1]] as [number, number],
+            dead: this.dead,
+            win: this.win,
+            direction: this.direction,
+            grounded: this.grounded,
+        };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    deserialize(data: any): void {
+        this.setPosition(data.position);
+        this.startPos = vec2.fromValues(data.startPos[0], data.startPos[1]);
+        this.dead = data.dead;
+        this.win = data.win;
+        this.direction = data.direction;
+        this.grounded = data.grounded;
+        this.dynamic = !data.dead;
         this.deathTimer = 0;
     }
 
