@@ -20,6 +20,12 @@ let time: number = 0.0;
 let gameStart: boolean = false;
 
 function main() {
+    // If there's a saved game, skip the menu and go straight to game
+    if (SaveManager.hasSave()) {
+        document.body.innerHTML = "";
+        BeginGame();
+        return;
+    }
 
     let rhythmTypeSelect = <HTMLSelectElement> document.getElementById("rhythmSelect");
     rhythmTypeSelect.onchange = () => {
@@ -84,7 +90,11 @@ function BeginGame() {
     let backBtn = document.createElement("button");
     backBtn.id = "backButton";
     backBtn.textContent = "Chơi lại";
-    backBtn.onclick = () => location.reload();
+    backBtn.onclick = () => {
+        SaveManager.stopAutoSave();
+        SaveManager.deleteSave();
+        window.location.href = window.location.pathname;
+    };
     document.body.appendChild(backBtn);
 
     const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
@@ -191,7 +201,9 @@ function BeginGame() {
     document.getElementById("btnReload").onclick = () => {
         SaveManager.stopAutoSave();
         SaveManager.deleteSave();
-        location.reload();
+        localStorage.clear();
+        localStorage.removeItem("platformer_save");
+        window.location.href = window.location.pathname;
     };
 
     const renderer = new OpenGLRenderer(canvas);
