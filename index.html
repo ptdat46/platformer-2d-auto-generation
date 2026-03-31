@@ -2,27 +2,99 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
-        <title>Trình Tạo Màn Chơi Platformer 2D</title>
+        <title>Soot Jumper</title>
+        <link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
         <style>
+            *, *::before, *::after { box-sizing: border-box; }
+
             html, body {
                 margin: 0;
+                padding: 0;
                 overflow: hidden;
                 display: flex;
-                flex: 1;
                 flex-direction: column;
                 align-items: center;
                 width: 100%;
-                font-family: "Helvetica";
-                text-align: "center";
-                background-color: #DDDDEE
+                height: 100vh;
+                font-family: "Helvetica", sans-serif;
+                text-align: center;
+                background: #0a0a0a;
             }
-            #canvas {
+
+            /* Full-screen start background */
+            #startScreen {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
                 width: 100%;
-                height: 100%;
+                height: 100vh; 
+    
+                background-image: url('img/startgame.png');
+                background-repeat: no-repeat; 
+                background-size: cover; 
+                background-position: center;
+                position: relative;
             }
+
+            /* Dark overlay so text is readable */
+            #startScreen::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.45);
+            }
+
+            #startScreen > * {
+                position: relative;
+                z-index: 1;
+            }
+
+            #gameTitle {
+                font-size: 72px;
+                font-weight: 900;
+                color: #FFD700;
+                letter-spacing: 6px;
+                text-shadow: 0 0 20px #FF8C00, 0 0 40px #FF4500, 0 4px 0 #8B4000;
+                margin: 0 0 60px;
+                font-family: "Helvetica", sans-serif;
+            }
+
+            #generateLevelButton {
+                padding: 18px 80px;
+                font-size: 28px;
+                font-weight: bold;
+                color: #1a1a1a;
+                background: linear-gradient(180deg, #FFE566 0%, #FFD700 50%, #DAA520 100%);
+                border: none;
+                border-radius: 12px;
+                cursor: pointer;
+                box-shadow: 0 6px 0 #8B4000, 0 8px 20px rgba(0,0,0,0.5);
+                transition: transform 0.1s, box-shadow 0.1s;
+                letter-spacing: 3px;
+            }
+            #generateLevelButton:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 0 #8B4000, 0 10px 24px rgba(0,0,0,0.5);
+            }
+            #generateLevelButton:active {
+                transform: translateY(4px);
+                box-shadow: 0 2px 0 #8B4000, 0 4px 12px rgba(0,0,0,0.5);
+            }
+
+            /* Settings panel below the button */
+            #settingsPanel {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                max-width: 900px;
+                padding: 30px 20px 20px;
+                gap: 16px;
+            }
+
             .sliders {
                 display: flex;
-                flex: 1;
                 flex-direction: row;
                 width: 100%;
             }
@@ -34,31 +106,29 @@
                 background: #D3D3D3;
                 outline: none;
             }
-            .slider-square::-moz-range-thumb, .slider-square::-moz-range-thumb {
+            .slider-square::-moz-range-thumb, .slider-square::-webkit-slider-thumb {
                 width: 25px;
                 height: 25px;
                 border-radius: 25%;
-                background: #4CAF50;
+                background: #DAA520;
                 cursor: pointer;
             }
 
             #groupNumberContainer, #groupLengthContainer {
                 width: 50%;
                 display: flex;
-                flex: 1;
                 flex-direction: column;
                 align-items: center;
             }
             #groupNumberSlider, #groupLengthSlider {
                 display: flex;
-                flex: 1;
                 flex-direction: row;
                 align-items: center;
                 width: 85%;
-                background: #AAAABB;
+                background: rgba(50,50,70,0.7);
                 border-radius: 10px;
-                padding-left: 10px;
-                padding-right: 10px;
+                padding: 8px 10px;
+                backdrop-filter: blur(4px);
             }
 
             .slider-display {
@@ -67,59 +137,56 @@
                 vertical-align: middle;
                 font-size: 14pt;
                 font-family: "Helvetica";
-                background: #BBBBCC;
+                background: rgba(80,80,110,0.9);
                 width: 15%;
-                height: 50%;
-                line-height: 42px;
+                height: 40px;
+                line-height: 40px;
                 border-radius: 5px;
-                color: #444444;
-            }
-
-            select {
-                position: relative;
-                font-family: "Helvetica";
-                height: 30px;
-                width: 100%;
-                font-size: 11pt;
+                color: #FFD700;
+                font-weight: bold;
             }
 
             .selects {
                 display: flex;
-                flex: 1;
                 flex-direction: row;
-                margin-top: 30px;
-                padding-bottom: 22px;
-                width: 94%;
+                padding: 16px;
+                width: 100%;
                 border-radius: 10px;
-                background: #AAAABB;
+                background: rgba(40,40,60,0.7);
+                backdrop-filter: blur(4px);
+                gap: 8px;
             }
 
             .selectContainer {
-                display: flex;;
+                display: flex;
                 flex: 1;
                 flex-direction: column;
-                width: 22%;
-                min-width: 115px;
-                margin-left: 10px;
-                margin-right: 10px;
                 align-items: center;
+                gap: 6px;
             }
-
             .selectContainer h3 {
+                margin: 0;
+                font-size: 12px;
+                color: #FFD700;
+                font-weight: bold;
                 word-break: break-word;
-                hyphens: auto;
             }
 
-            button {
-                margin-top: 30px;
-                height: 50px;
-                width: 50%;
-                border-radius: 5px;
-                border-style: none;
-                background-color: #AABBCC;
-                font-size: 20pt;
-                color: #DEDEDE;
-                font-weight: bold;
+            select {
+                font-family: "Helvetica";
+                height: 30px;
+                width: 100%;
+                font-size: 11pt;
+                background: rgba(60,60,90,0.9);
+                color: #eee;
+                border: 1px solid #555;
+                border-radius: 4px;
+            }
+
+            #canvas {
+                display: block;
+                width: 100%;
+                height: 100%;
             }
 
             #winText {
@@ -167,88 +234,93 @@
                 z-index: 10;
                 opacity: 0.95;
             }
-            #backButton:hover {
-                background-color: #B8860B;
+            #backButton:hover { background-color: #B8860B; }
+
+            /* Settings section heading */
+            #settingsHeading {
+                color: #FFD700;
+                font-size: 16px;
+                font-weight: bold;
+                letter-spacing: 2px;
+                margin: 0 0 8px;
+                text-transform: uppercase;
+                opacity: 0.8;
             }
-
-
         </style>
     </head>
 
     <body>
-        <h1>Trình Tạo Màn Chơi</h1>
+        <!-- Start screen with background image -->
+        <div id="startScreen">
+            <h1 id="gameTitle">SOOT JUMPER</h1>
+            <button id="generateLevelButton">BẮT ĐẦU</button>
+        </div>
 
-        <div class="sliders">
-            <div id="groupLengthContainer">
-                <h3>Độ Dài Nhóm Nhịp</h3>
-                <div id="groupLengthSlider">
-                    <input id="timeSelect" type="range" min=10 max=30 value=20 autocomplete="off" class="slider-square">
-                    <p id="timeSelectDisplay" class="slider-display">20 giây</p>
+        <!-- Settings panel (visible on start screen below button) -->
+        <div id="settingsPanel">
+            <p id="settingsHeading">— Cài Đặt —</p>
+            <div class="sliders">
+                <div id="groupLengthContainer">
+                    <h3>Độ Dài Nhóm Nhịp</h3>
+                    <div id="groupLengthSlider">
+                        <input id="timeSelect" type="range" min=10 max=30 value=20 autocomplete="off" class="slider-square">
+                        <p id="timeSelectDisplay" class="slider-display">20 giây</p>
+                    </div>
+                </div>
+                <div id="groupNumberContainer">
+                    <h3>Số Lượng Nhóm Nhịp</h3>
+                    <div id="groupNumberSlider">
+                        <input id="numberSelect" type="range" min=1 max=10 value=3 autocomplete="off" class="slider-square">
+                        <p id="numberDisplay" class="slider-display">3</p>
+                    </div>
                 </div>
             </div>
 
-            <div id="groupNumberContainer">
-                <h3>Số Lượng Nhóm Nhịp</h3>
-                <div id="groupNumberSlider">
-                    <input id="numberSelect" type="range" min=1 max=10 value=3 autocomplete="off" class="slider-square">
-                    <p id="numberDisplay" class="slider-display">3</p>
+            <div class="selects">
+                <div class="selectContainer">
+                    <h3>Loại Nhịp</h3>
+                    <select id="rhythmSelect" autocomplete="off">
+                        <option value="0" selected="selected">Đều</option>
+                        <option value="1">Ngẫu Nhiên</option>
+                        <option value="2">Nhịp Lắc</option>
+                        <option value="3">Đều Và Lắc</option>
+                    </select>
+                </div>
+                <div class="selectContainer">
+                    <h3>Trọng Lực</h3>
+                    <select id="gravitySelect" autocomplete="off">
+                        <option value="1.75">Thấp</option>
+                        <option value="2.50" selected="selected">Bình Thường</option>
+                        <option value="3.25">Cao</option>
+                    </select>
+                </div>
+                <div class="selectContainer">
+                    <h3>Lực Nhảy</h3>
+                    <select id="jumpSelect" autocomplete="off">
+                        <option value="4.5">Yếu</option>
+                        <option value="5.5" selected="selected">Bình Thường</option>
+                        <option value="6.5">Mạnh</option>
+                    </select>
+                </div>
+                <div class="selectContainer">
+                    <h3>Tốc Độ Di Chuyển</h3>
+                    <select id="speedSelect" autocomplete="off">
+                        <option value="7.5">Chậm</option>
+                        <option value="9.5" selected="selected">Bình Thường</option>
+                        <option value="14.5">Nhanh</option>
+                    </select>
+                </div>
+                <div class="selectContainer">
+                    <h3>Mật Độ Màn Chơi</h3>
+                    <select id="densitySelect" autocomplete="off">
+                        <option value="0.5">Thưa</option>
+                        <option value="1.0" selected="selected">Bình Thường</option>
+                        <option value="2.0">Dày Đặc</option>
+                    </select>
                 </div>
             </div>
         </div>
-
-        <div class="selects">
-            <div class="selectContainer">
-                <h3>Loại Nhịp</h3>
-                <select id="rhythmSelect" autocomplete="off">
-                    <option value="0" selected="selected">Đều</option>
-                    <option value="1">Ngẫu Nhiên</option>
-                    <option value="2">Nhịp Lắc</option>
-                    <option value="3">Đều Và Lắc</option>
-                </select>
-            </div>
-
-            <div class="selectContainer">
-                <h3>Trọng Lực</h3>
-                <select id="gravitySelect" autocomplete="off">
-                    <option value="1.75">Thấp</option>
-                    <option value="2.50" selected="selected">Bình Thường</option>
-                    <option value="3.25">Cao</option>
-                </select>
-            </div>
-
-            <div class="selectContainer">
-                <h3>Lực Nhảy</h3>
-                <select id="jumpSelect" autocomplete="off">
-                    <option value="4.5">Yếu</option>
-                    <option value="5.5" selected="selected">Bình Thường</option>
-                    <option value="6.5">Mạnh</option>
-                </select>
-            </div>
-
-            <div class="selectContainer">
-                <h3>Tốc Độ Di Chuyển</h3>
-                <select id="speedSelect" autocomplete="off">
-                    <option value="7.5">Chậm</option>
-                    <option value="9.5" selected="selected">Bình Thường</option>
-                    <option value="14.5">Nhanh</option>
-                </select>
-            </div>
-
-            <div class="selectContainer">
-                <h3>Mật Độ Màn Chơi</h3>
-                <select id="densitySelect" autocomplete="off">
-                    <option value="0.5">Thưa</option>
-                    <option value="1.0" selected="selected">Bình Thường</option>
-                    <option value="2.0">Dày Đặc</option>
-                </select>
-            </div>
-        </div>
-
-        <button id="generateLevelButton">
-            Tạo Màn Chơi
-        </button>
 
         <script type="text/javascript" src="dist/bundle.js"></script>
-
     </body>
 </html>

@@ -22,9 +22,24 @@ let gameStart: boolean = false;
 function main() {
     // If there's a saved game, skip the menu and go straight to game
     if (SaveManager.hasSave()) {
-        document.body.innerHTML = "";
+        let startScreen = document.getElementById("startScreen");
+        let settingsPanel = document.getElementById("settingsPanel");
+        if (startScreen) (startScreen as HTMLElement).style.display = "none";
+        if (settingsPanel) (settingsPanel as HTMLElement).style.display = "none";
         BeginGame();
         return;
+    }
+
+    // Wire up "Bắt Đầu" button to start the game
+    let startBtn = document.getElementById("generateLevelButton");
+    if (startBtn) {
+        startBtn.onclick = () => {
+            let startScreen = document.getElementById("startScreen");
+            let settingsPanel = document.getElementById("settingsPanel");
+            if (startScreen) (startScreen as HTMLElement).style.display = "none";
+            if (settingsPanel) (settingsPanel as HTMLElement).style.display = "none";
+            BeginGame();
+        };
     }
 
     let rhythmTypeSelect = <HTMLSelectElement> document.getElementById("rhythmSelect");
@@ -68,11 +83,6 @@ function main() {
         sceneAttributes.levelDensity = parseFloat(densitySelect.value);
     }
 
-    let startButton = <HTMLButtonElement> document.getElementById("generateLevelButton");
-    startButton.onclick = () => {
-        document.body.innerHTML = "";
-        BeginGame();
-    }
 
 }
 
