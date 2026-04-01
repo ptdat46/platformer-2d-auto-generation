@@ -84,6 +84,7 @@
 
             /* Settings panel below the button */
             #settingsPanel {
+                margin-top: 1.5rem;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -97,6 +98,7 @@
                 display: flex;
                 flex-direction: row;
                 width: 100%;
+                color: white
             }
             .slider-square {
                 -webkit-appearance: none;
@@ -254,21 +256,19 @@
         <div id="startScreen">
             <h1 id="gameTitle">SOOT JUMPER</h1>
             <button id="generateLevelButton">BẮT ĐẦU</button>
-        </div>
 
-        <!-- Settings panel (visible on start screen below button) -->
-        <div id="settingsPanel">
+            <div id="settingsPanel">
             <p id="settingsHeading">— Cài Đặt —</p>
             <div class="sliders">
                 <div id="groupLengthContainer">
-                    <h3>Độ Dài Nhóm Nhịp</h3>
+                    <h3>Độ Dài Giữa Các Checkpoints</h3>
                     <div id="groupLengthSlider">
                         <input id="timeSelect" type="range" min=10 max=30 value=20 autocomplete="off" class="slider-square">
-                        <p id="timeSelectDisplay" class="slider-display">20 giây</p>
+                        <p id="timeSelectDisplay" class="slider-display">20 khối</p>
                     </div>
                 </div>
                 <div id="groupNumberContainer">
-                    <h3>Số Lượng Nhóm Nhịp</h3>
+                    <h3>Số Lượng Checkpoints</h3>
                     <div id="groupNumberSlider">
                         <input id="numberSelect" type="range" min=1 max=10 value=3 autocomplete="off" class="slider-square">
                         <p id="numberDisplay" class="slider-display">3</p>
@@ -320,6 +320,10 @@
                 </div>
             </div>
         </div>
+        </div>
+
+        <!-- Settings panel (visible on start screen below button) -->
+        
 
         <script type="text/javascript" src="dist/bundle.js"></script>
     </body>
