@@ -19,13 +19,13 @@ module.exports = {
         loader: 'webpack-glsl-loader'
       },
       {
-        test: /\.(png|svg|jpg|gif)$/,
+        test: /\.(png|svg|jpg|gif|mp3|wav|ogg)$/,
         type: 'asset/resource'
       }
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js', '.png'],
+    extensions: ['.ts', '.js', '.png', '.mp3', '.wav', '.ogg'],
   },
   devtool: 'source-map',
   devServer: {

@@ -248,6 +248,40 @@
                 text-transform: uppercase;
                 opacity: 0.8;
             }
+
+            #musicVolumeContainer {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                width: 100%;
+                background: rgba(50,50,70,0.7);
+                border-radius: 10px;
+                padding: 8px 16px;
+                backdrop-filter: blur(4px);
+                gap: 12px;
+            }
+            #musicVolumeContainer label {
+                color: #FFD700;
+                font-size: 12px;
+                font-weight: bold;
+                white-space: nowrap;
+            }
+            #musicVolumeSlider {
+                -webkit-appearance: none;
+                flex: 1;
+                height: 6px;
+                border-radius: 3px;
+                background: #D3D3D3;
+                outline: none;
+            }
+            #musicVolumeSlider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #DAA520;
+                cursor: pointer;
+            }
         </style>
     </head>
 
@@ -318,11 +352,23 @@
                         <option value="2.0">Dày Đặc</option>
                     </select>
                 </div>
+                <div class="selectContainer">
+                    <h3>Nhạc Nền</h3>
+                    <select id="musicSelect" autocomplete="off">
+                        <option value="0">Mặc Định</option>
+                        <option value="music/beat1.mp3">Beat 1</option>
+                        <option value="music/beat2.mp3">Beat 2</option>
+                        <option value="music/beat3.mp3">Beat 3</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="musicVolumeContainer">
+                <label>Âm Lượng Nhạc</label>
+                <input id="musicVolumeSlider" type="range" min="0" max="100" value="30" class="slider-square">
             </div>
         </div>
         </div>
-
-        <!-- Settings panel (visible on start screen below button) -->
         
 
         <script type="text/javascript" src="dist/bundle.js"></script>

@@ -1,5 +1,6 @@
 import {vec2, vec3} from 'gl-matrix';
 import SaveManager from './scene/SaveManager';
+import audioManager from './audio/AudioManager';
 
 import {setGL} from './globals';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
@@ -49,9 +50,9 @@ function main() {
 
     let groupLengthSlider = <HTMLInputElement> document.getElementById("timeSelect");
     let groupLengthOutput = document.getElementById("timeSelectDisplay");
-    groupLengthOutput.innerHTML = groupLengthSlider.value + " giây";
+    groupLengthOutput.innerHTML = groupLengthSlider.value + " khối";
     groupLengthSlider.oninput = () => {
-        groupLengthOutput.innerHTML = groupLengthSlider.value + " giây";
+        groupLengthOutput.innerHTML = groupLengthSlider.value + " khối";
         sceneAttributes.rhythmGroupLength = parseInt(groupLengthSlider.value);
     }
 
@@ -82,6 +83,22 @@ function main() {
     densitySelect.onchange = () => {
         sceneAttributes.levelDensity = parseFloat(densitySelect.value);
     }
+
+    let musicSelect = <HTMLSelectElement> document.getElementById("musicSelect");
+    musicSelect.onchange = () => {
+        let track = musicSelect.value;
+        if (track === '0') {
+            audioManager.stop();
+        } else {
+            audioManager.play(track);
+        }
+    };
+
+    let musicVolumeSlider = <HTMLInputElement> document.getElementById("musicVolumeSlider");
+    musicVolumeSlider.oninput = () => {
+        audioManager.setVolume(parseInt(musicVolumeSlider.value) / 100);
+    };
+    audioManager.setVolume(parseInt(musicVolumeSlider.value) / 100);
 
 
 }
